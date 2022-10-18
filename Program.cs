@@ -54,7 +54,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         };
     });
 
-
+//builder.Services.AddAuthorization(options =>
+//{
+//    options.AddPolicy("UserOnly", policy => policy.RequireClaim("role", "Farmer", "Dealer"));
+//    options.AddPolicy("AdminOnly", policy => policy.RequireClaim("role", "Admin"));
+//});
 
 var app = builder.Build();
 

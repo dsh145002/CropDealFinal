@@ -65,3 +65,7 @@ C:\Users\Devendra Sharma\Downloads\Dot Net Full Stack\Csharp\.netCore\CaseStudy\
 C:\Users\Devendra Sharma\Downloads\Dot Net Full Stack\Csharp\.netCore\CaseStudy\bin\Debug\net6.0\System.Web.Http.dll
 C:\Users\Devendra Sharma\Downloads\Dot Net Full Stack\Csharp\.netCore\CaseStudy\bin\Debug\net6.0\Newtonsoft.Json.dll
 C:\Users\Devendra Sharma\Downloads\Dot Net Full Stack\Csharp\.netCore\CaseStudy\bin\Debug\net6.0\Newtonsoft.Json.Bson.dll
+C:\Users\Devendra Sharma\Downloads\Dot Net Full Stack\Csharp\.netCore\CaseStudy\bin\Debug\net6.0\Microsoft.Extensions.DependencyModel.dll
+C:\Users\Devendra Sharma\Downloads\Dot Net Full Stack\Csharp\.netCore\CaseStudy\bin\Debug\net6.0\Scrutor.dll
+C:\Users\Devendra Sharma\Downloads\Dot Net Full Stack\Csharp\.netCore\CaseStudy\bin\Debug\net6.0\Swashbuckle.AspNetCore.Filters.dll
+C:\Users\Devendra Sharma\Downloads\Dot Net Full Stack\Csharp\.netCore\CaseStudy\bin\Debug\net6.0\Swashbuckle.AspNetCore.Filters.Abstractions.dll
