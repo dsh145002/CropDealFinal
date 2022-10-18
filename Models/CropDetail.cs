@@ -10,14 +10,13 @@ namespace CaseStudy.Models
         public int CropTypeId { get; set; }
         [ForeignKey("User")]
         public int FarmerId { get; set; }
-
         public User User { get; set; }
-       
         public string CropName { get; set; } = null!;
         public string Location { get; set; } = null!;
         public int QtyAvailable { get; set; }
         public decimal ExpectedPrice { get; set; }
         public CropType CropType { get; set; }
-        
+
+        public IEnumerable<Invoice> Invoices { get; set; }
     }
 }

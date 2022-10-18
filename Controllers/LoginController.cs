@@ -1,11 +1,14 @@
 ﻿using CaseStudy.Dtos;
 using CaseStudy.Models;
+using CaseStudy.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -17,12 +20,14 @@ namespace CaseStudy.Controllers
     public class LoginController : ControllerBase
     {
         private DatabaseContext _databaseContext;
-        public LoginController(DatabaseContext context)
+        LoginService _loginService;
+        public LoginController(DatabaseContext context,LoginService service)
         {
             _databaseContext = context;
+            _loginService = service;
         }
-        
-        
+
+
 
         //[HttpPost("register")]
         //[AllowAnonymous]
@@ -48,7 +53,7 @@ namespace CaseStudy.Controllers
         //        address.State = newUser.State;
 
         //        user.Address = address;
-                
+
         //        Account acc = new Account();
         //        //Account
         //        acc.AccountNumber = newUser.AccountNumber;
@@ -61,30 +66,38 @@ namespace CaseStudy.Controllers
         //        return Ok();
         //    }
         //    return BadRequest();
-           
+
         //}
         [HttpPost]
-        public ActionResult<string> Login(LoginDto loginData)
+        public async Task<ActionResult<string>> Login(LoginDto loginData)
         {
-            
-            var user = _databaseContext.Users.Include("Role").SingleOrDefault(a => a.Email == loginData.username);
-            if (user == null) return NotFound();
-            else if(!VerifyPassword(loginData.password, user.PasswordHash, user.PasswordSalt))
+            var res = await _loginService.Login(loginData);
+
+            if (res == HttpStatusCode.OK)
             {
-                return BadRequest("Wrong Password");
+                var token = GenerateToken(loginData);
+                return token;
             }
-            string token = GenerateToken(user);
-            return token;
- 
+            else if (res == HttpStatusCode.Unauthorized)
+            {
+                return Unauthorized("Wrong Password!!");
+            }
+            else if (res == HttpStatusCode.NotFound)
+            {
+                return BadRequest("User not Found. Check username or Register");
+            }
+
+            return BadRequest("Some Error Occured"); 
+            
         }
 
 
-        private string GenerateToken(User user)
+        private string GenerateToken(LoginDto user)
         {
             IEnumerable<Claim> claims = new List<Claim>
             {
-                new Claim("email",user.Email),
-                new Claim("role",user.Role.RoleName),
+                new Claim("email",user.username),
+                new Claim("role",user.role),
             };
 
             var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("thisisadummytokenkey"));
@@ -98,13 +111,6 @@ namespace CaseStudy.Controllers
             
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        private bool VerifyPassword(string password, byte[] passwordHash,byte[] passwordSalt)
-        {
-            using(var hmac = new HMACSHA512(passwordSalt))
-            {
-                var passHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return passHash.SequenceEqual(passwordHash);
-            }
-        }
+       
     }
 }

@@ -27,7 +27,6 @@ namespace CaseStudy.Controllers
                     return BadRequest();
                 }
                 return Ok(res);
-            
         }
     }
 }

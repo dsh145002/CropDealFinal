@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Bson;
 
 namespace CaseStudy.Models
 {
@@ -11,11 +12,31 @@ namespace CaseStudy.Models
         public DbSet<Rating> Ratings { get; set; } = null!;
          public DbSet<CropType> CropTypes { get;set;}= null!;
         public DbSet<CropDetail>  CropDetails { get;set;}= null!;
-
+        public DbSet<Invoice> Invoices { get; set; } = null!;
+        public DbSet<Admin> Admins { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(@"data source=.\sqlexpress;database=model;integrated security=SSPI");
             base.OnConfiguring(optionsBuilder);
         } 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+
+            modelBuilder.Entity<Invoice>(
+                entity =>
+                entity.HasOne(f => f.Farmer)
+                .WithMany(e => e.FarmerInvoices)
+                .HasPrincipalKey(k => k.UserId)
+                .HasForeignKey(k => k.FarmerId)
+                .OnDelete(DeleteBehavior.ClientSetNull));
+
+            modelBuilder.Entity<Invoice>(
+                entity =>
+                entity.HasOne(f => f.Dealer)
+                .WithMany(e => e.DealerInvoices)
+                .HasPrincipalKey(k => k.UserId)
+                .HasForeignKey(k => k.DealerId)
+                .OnDelete(DeleteBehavior.ClientSetNull));
+        }
     }
 }

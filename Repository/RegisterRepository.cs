@@ -31,7 +31,6 @@ namespace CaseStudy.Repository
                 user.Status = newUser.Status;
                 user.RoleId = (int)Enum.Parse(typeof(Role), newUser.Role);
 
-
                 using (var hmac = new HMACSHA512())
                 {
                     user.PasswordSalt = hmac.Key;
