@@ -1,3 +1,4 @@
+using AutoMapper;
 using CaseStudy.Models;
 using CaseStudy.Repository;
 using CaseStudy.Services;
@@ -12,7 +13,14 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name:"corsuse",
+                      builder =>
+                      {
+                          builder.WithOrigins("http://localhost:4200").AllowCredentials().AllowAnyHeader().AllowAnyMethod().WithExposedHeaders();
+                      });
+});
 builder.Services.AddControllers();
 builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
@@ -34,13 +42,20 @@ builder.Services.AddSwaggerGen(options =>
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddDbContext<DatabaseContext>();
 
 builder.Services.AddScoped<IRegisterRepository, RegisterRepository>();
 builder.Services.AddScoped<RegisterService,RegisterService>();
+builder.Services.AddScoped<ICropRepository, CropRepository>();
+builder.Services.AddScoped<CropService, CropService>();
 builder.Services.AddScoped<ILoginRepository,LoginRepository>();
 builder.Services.AddScoped<LoginService, LoginService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<UserService, UserService>();
+builder.Services.AddScoped<InvoiceRepository, InvoiceRepository>();
+builder.Services.AddScoped<InvoiceService, InvoiceService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
     options =>
@@ -68,6 +83,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseStaticFiles();
+app.UseRouting();
+
+app.UseCors("corsuse");
 
 app.UseHttpsRedirection();
 

@@ -21,62 +21,41 @@ namespace CaseStudy.Controllers
     {
         private DatabaseContext _databaseContext;
         LoginService _loginService;
-        public LoginController(DatabaseContext context,LoginService service)
+        public LoginController(DatabaseContext context, LoginService service)
         {
             _databaseContext = context;
             _loginService = service;
         }
 
-
-
-        //[HttpPost("register")]
-        //[AllowAnonymous]
-        //public async Task<ActionResult<User>> Register(CreateUserDto newUser)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        var user = new User();
-        //        user.Name = newUser.Name;
-        //        user.Email = newUser.Email;
-        //        user.Phone = newUser.Phone;
-        //        user.Status = newUser.Status;
-        //        user.RoleId = (int)Enum.Parse(typeof(Role), newUser.Role);
-        //        CreatePasswordHash(newUser.Password, out byte[] passwordHash, out byte[] passwordSalt);
-        //        user.PasswordSalt = passwordSalt;
-        //        user.PasswordHash = passwordHash;
-
-
-        //        //Address
-        //        var address = new Address();
-        //        address.Line = newUser.Line;
-        //        address.City = newUser.City;
-        //        address.State = newUser.State;
-
-        //        user.Address = address;
-
-        //        Account acc = new Account();
-        //        //Account
-        //        acc.AccountNumber = newUser.AccountNumber;
-        //        acc.IFSCCode = newUser.IFSC;
-        //        acc.BankName = newUser.BankName;
-        //        user.Account = acc;
-
-        //        _databaseContext.Users.Add(user);
-        //        _databaseContext.SaveChanges();
-        //        return Ok();
-        //    }
-        //    return BadRequest();
-
-        //}
         [HttpPost]
-        public async Task<ActionResult<string>> Login(LoginDto loginData)
+        public async Task<ActionResult<Tokens>> Login(LoginDto loginData)
         {
             var res = await _loginService.Login(loginData);
 
             if (res == HttpStatusCode.OK)
             {
-                var token = GenerateToken(loginData);
-                return token;
+                
+                if (loginData.role == "Admin")
+                {
+                    string userId = _databaseContext.Admins.SingleOrDefault(a => a.Email == loginData.username).AdminId.ToString();
+                    var token = GenerateToken(loginData);
+                    
+                    return new Tokens{ Role = loginData.role,
+                    UserId = userId,Token=token };
+                }
+                else
+                {
+                    string userId = _databaseContext.Users.SingleOrDefault(a => a.Email == loginData.username).UserId.ToString();
+                    var token = GenerateToken(loginData);
+
+                    return new Tokens
+                    {
+                        Role = loginData.role,
+                        UserId = userId,
+                        Token = token
+                    };
+                }
+               
             }
             else if (res == HttpStatusCode.Unauthorized)
             {
@@ -97,7 +76,8 @@ namespace CaseStudy.Controllers
             IEnumerable<Claim> claims = new List<Claim>
             {
                 new Claim("email",user.username),
-                new Claim("role",user.role),
+                new Claim(ClaimTypes.Role,user.role),
+                
             };
 
             var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("thisisadummytokenkey"));

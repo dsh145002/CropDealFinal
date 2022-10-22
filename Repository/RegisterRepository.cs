@@ -1,4 +1,4 @@
-﻿using CaseStudy.Dtos;
+﻿using CaseStudy.Dtos.UserDtos;
 using CaseStudy.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

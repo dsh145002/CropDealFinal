@@ -1,14 +1,16 @@
 {
   "version": 2,
-  "dgSpecHash": "rDqcgZgYDtM0yDULRaqMT1tk/jPT1Ivj+8JjfUn2vTFxjGLZzhkLH1chAtfbjvmBekLwAhx2s41O5srGUoEhIg==",
+  "dgSpecHash": "LCYj0IgdHQIBH606yXyj0hqRf/Nsjgomkp50PuixMYwfrmGNgmZzJ7+tvbWL18y7DZciZm33Sv+cwR/imdBtkw==",
   "success": true,
   "projectFilePath": "C:\\Users\\Devendra Sharma\\Downloads\\Dot Net Full Stack\\Csharp\\.netCore\\CaseStudy\\CaseStudy.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\Devendra Sharma\\.nuget\\packages\\automapper\\12.0.0\\automapper.12.0.0.nupkg.sha512",
+    "C:\\Users\\Devendra Sharma\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.0\\automapper.extensions.microsoft.dependencyinjection.12.0.0.nupkg.sha512",
     "C:\\Users\\Devendra Sharma\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\Devendra Sharma\\.nuget\\packages\\microsoft.aspnet.webapi.client\\5.2.9\\microsoft.aspnet.webapi.client.5.2.9.nupkg.sha512",
     "C:\\Users\\Devendra Sharma\\.nuget\\packages\\microsoft.aspnet.webapi.core\\5.2.9\\microsoft.aspnet.webapi.core.5.2.9.nupkg.sha512",
     "C:\\Users\\Devendra Sharma\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\6.0.10\\microsoft.aspnetcore.authentication.jwtbearer.6.0.10.nupkg.sha512",
-    "C:\\Users\\Devendra Sharma\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",
+    "C:\\Users\\Devendra Sharma\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
     "C:\\Users\\Devendra Sharma\\.nuget\\packages\\microsoft.data.sqlclient\\2.1.4\\microsoft.data.sqlclient.2.1.4.nupkg.sha512",
     "C:\\Users\\Devendra Sharma\\.nuget\\packages\\microsoft.data.sqlclient.sni.runtime\\2.1.1\\microsoft.data.sqlclient.sni.runtime.2.1.1.nupkg.sha512",
     "C:\\Users\\Devendra Sharma\\.nuget\\packages\\microsoft.entityframeworkcore\\6.0.10\\microsoft.entityframeworkcore.6.0.10.nupkg.sha512",

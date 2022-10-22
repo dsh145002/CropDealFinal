@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace CaseStudy.Models
 {
@@ -15,8 +16,11 @@ namespace CaseStudy.Models
        
         [ForeignKey("CropDetail")]
         public int CropId { get; set; }
+        
         public CropDetail CropDetail { get; set; }
+        
         public User Farmer { get; set; }
+        
         public User Dealer { get; set; }
     }
 }

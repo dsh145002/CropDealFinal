@@ -1,24 +1,17 @@
-﻿using CaseStudy.Models;
+using CaseStudy.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace CaseStudy.Dtos
+namespace CaseStudy.Dtos.UserDtos
 {
-    public class CreateUserDto
+    public class UpdateUserDto
     {
-        [Required]
-        public string Role { get; set; } = null!;
-        [Required]
-        public string Name { get; set; } = null!;
         [Required]
         public string Email { get; set; } = null!;
         [Required]
-        public string Password { get; set; } = null!;
-        [Required]
         public string Phone { get; set; } = null!;
 
-        public string Status = "Active";
 
-        //Account
+        //Address
         [Required]
         public string Line { get; set; } = null!;
         [Required]
@@ -34,7 +27,5 @@ namespace CaseStudy.Dtos
         public string IFSC { get; set; } = null!;
         [Required]
         public string BankName { get; set; } = null!;
-
-
     }
 }
