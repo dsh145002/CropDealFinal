@@ -15,5 +15,6 @@ namespace CaseStudy.Repository
 	    Task<ActionResult<User>> StatusUpdateAsync(string stat, int id);
         Task<HttpStatusCode> AddRatingAsync(RatingDto ratinginfo, int id);
         Task<HttpStatusCode> UpdateRatingAsync(RatingDto ratinginfo, int id);
+        Task<Double> AvgUserRating(int id);
     }
 }

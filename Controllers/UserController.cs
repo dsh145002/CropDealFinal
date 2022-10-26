@@ -95,7 +95,7 @@ namespace CaseStudy.Controllers
         }
 
         [HttpPost("add-rating/{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<ActionResult> GiveRating(RatingDto ratinginfo, int id)
         {
             var res = await _userService.AddRating(ratinginfo, id);
@@ -106,16 +106,18 @@ namespace CaseStudy.Controllers
             return Ok(res);
         }
 
-        [HttpPost("update-rating/{id}")]
-        [Authorize(Roles = "Admin" )]        
-        public async Task<ActionResult> ChangeRating(RatingDto ratinginfo, int id)
+              
+     
+        [HttpGet("getRating/{id}")]
+        [Authorize]
+        public async Task<Double> GetAvgUserRating(int id)
         {
-            var res = await _userService.UpdateRating(ratinginfo, id);
-            if (res == HttpStatusCode.NotFound || res == HttpStatusCode.BadRequest)
+            var res = await _userService.AvgUserRating(id);
+            if(res<0 || res == null)
             {
-                return BadRequest();
+                return 0.0;
             }
-            return Ok(res);
+            return res;
         }
     }
 }

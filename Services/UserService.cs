@@ -50,5 +50,9 @@ namespace CaseStudy.Services
 	{
 		return await _repo.UpdateRatingAsync(ratinginfo,id);
 	}
+		public async Task<Double> AvgUserRating(int id)
+		{
+			return await _repo.AvgUserRating(id);
+		}
 }
 }

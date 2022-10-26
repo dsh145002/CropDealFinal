@@ -19,7 +19,7 @@ namespace CaseStudy.Models
         
         public Address Address { get; set; }
         
-        public Rating Rating { get; set; }
+        public IEnumerable<Rating> Ratings { get; set; }
         [JsonIgnore]
         public IEnumerable<CropDetail> CropDetails { get; set; }  = null!;
         [JsonIgnore]
