@@ -17,11 +17,11 @@ namespace CaseStudy.Services
             return await _repo.CreateInvoice(data);
         }
 
-        public async Task<IEnumerable<FarmerReceipt>> FarmerInvoices(int fid)
+        public async Task<IEnumerable<FarmerReceipt>> FarmerInvoices(int uid)
         {
-            return await _repo.FarmerInvoices(fid);
+            return await _repo.FarmerInvoices(uid);
         }
-        public async Task<IEnumerable<Invoice>> DealerInvoices(int did)
+        public async Task<IEnumerable<FarmerReceipt>> DealerInvoices(int did)
         {
             return await _repo.DealerInvoices(did);
         }

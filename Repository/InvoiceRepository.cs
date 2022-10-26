@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
 using System.Net.Mail;
 using System.Net;
 using System.Web.Http.ModelBinding;
+using System.Security.Cryptography;
 
 namespace CaseStudy.Repository
 {
@@ -32,7 +33,7 @@ namespace CaseStudy.Repository
             invoice.CropId = data.CropId;
             invoice.InvoiceDate = DateTime.Now;
 
-            _context.Add(invoice);
+            _context.Invoices.Add(invoice);
             await _context.SaveChangesAsync();
 
             
@@ -53,15 +54,59 @@ namespace CaseStudy.Repository
         public async Task<IEnumerable<FarmerReceipt>> FarmerInvoices(int fid)
         {
             var invoices = await _context.Invoices.Where(a => a.FarmerId == fid)
+                .OrderBy(p=>p.InvoiceDate)
+                //.Select(p => new FarmerReceipt()
+                //{
+                //    InvoiceDate = DateTime.Now,
+                //    InvoiceId = p.InvoiceId,
+                //    CropName= _context.CropDetails.SingleOrDefault(a => a.CropId == p.CropId).CropName,
+                //    CropType = _context.CropDetails.Include("CropType").SingleOrDefault(a => a.CropId == p.CropId).CropType.TypeName,
+                //    FarmerAccNumber= _context.Accounts.SingleOrDefault(a => a.UserId == fid).AccountNumber,
+                //    DealerAccNumber = _context.Accounts.SingleOrDefault(a => a.UserId == p.DealerId).AccountNumber,
+                //    Quantity = _context.CropDetails.SingleOrDefault(a => a.CropId == p.CropId).QtyAvailable,
+                //    Price = _context.CropDetails.SingleOrDefault(a => a.CropId == p.CropId).ExpectedPrice
+                //})
+                .ToListAsync();
+            var receipts = new List<FarmerReceipt>();
+            foreach(Invoice p in invoices)
+            {
+                var crop = _context.CropDetails.Include("CropType").SingleOrDefault(a => a.CropId == p.CropId);
+                var farmer = _context.Accounts.SingleOrDefault(a => a.UserId == fid);
+                var deal = _context.Accounts.SingleOrDefault(a => a.UserId == p.DealerId);
+
+                var receipt = new FarmerReceipt()
+                {
+                    InvoiceDate = p.InvoiceDate,
+                    InvoiceId = p.InvoiceId,
+                    CropName = crop.CropName,
+                    CropType = crop.CropType.TypeName,
+                    DealerAccNumber = deal.AccountNumber,
+                    FarmerAccNumber = farmer.AccountNumber,
+                    Price = crop.ExpectedPrice,
+                    Quantity = crop.QtyAvailable
+                };
+                receipts.Add(receipt);
+            }
+
+            if (invoices.Count < 0)
+            {
+                return null;
+            }
+            return receipts;
+        }
+        public async Task<IEnumerable<FarmerReceipt>> DealerInvoices(int did)
+        {
+            var invoices = await _context.Invoices.Where(a => a.DealerId == did)
                 .Select(p => new FarmerReceipt()
                 {
-                    InvoiceDate = DateTime.Now,
+                    InvoiceDate = p.InvoiceDate,
                     InvoiceId = p.InvoiceId,
-                    CropName= _context.CropDetails.SingleOrDefault(a => a.CropId == p.CropId).CropName,
+                    CropName = _context.CropDetails.SingleOrDefault(a => a.CropId == p.CropId).CropName,
                     CropType = _context.CropDetails.Include("CropType").SingleOrDefault(a => a.CropId == p.CropId).CropType.TypeName,
-                    FarmerAccNumber= _context.Users.Include("Account").SingleOrDefault(a => a.UserId == fid).Account.AccountNumber,
-                    DealerAccNumber = _context.Users.Include("Account").SingleOrDefault(a => a.UserId == p.DealerId).Account.AccountNumber,
-                    Quantity = _context.CropDetails.SingleOrDefault(a => a.CropId == p.CropId).QtyAvailable
+                    FarmerAccNumber = _context.Accounts.SingleOrDefault(a => a.UserId == p.FarmerId).AccountNumber,
+                    DealerAccNumber = _context.Accounts.SingleOrDefault(a => a.UserId == did).AccountNumber,
+                    Quantity = _context.CropDetails.SingleOrDefault(a => a.CropId == p.CropId).QtyAvailable,
+                    Price = _context.CropDetails.SingleOrDefault(a => a.CropId == p.CropId).ExpectedPrice
                 })
                 .ToListAsync();
 
@@ -71,17 +116,38 @@ namespace CaseStudy.Repository
             }
             return invoices;
         }
-        public async Task<IEnumerable<Invoice>> DealerInvoices(int did)
+        public async Task<IEnumerable<FarmerReceipt>> GetInvoices()
         {
-            var invoices = await _context.Invoices.Where(a => a.DealerId == did).ToListAsync();
+            var invoices =await  _context.Invoices
+                .OrderBy(p=>p.InvoiceDate)
+                .ToListAsync();
+            var receipts = new List<FarmerReceipt>();
+            foreach (Invoice p in invoices)
+            {
+                var crop = _context.CropDetails.Include("CropType").SingleOrDefault(a => a.CropId == p.CropId);
+                var farmer = _context.Accounts.SingleOrDefault(a => a.UserId == p.FarmerId);
+                var deal = _context.Accounts.SingleOrDefault(a => a.UserId == p.DealerId);
+
+                var receipt = new FarmerReceipt()
+                {
+                    InvoiceDate = DateTime.Now,
+                    InvoiceId = p.InvoiceId,
+                    CropName = crop.CropName,
+                    CropType = crop.CropType.TypeName,
+                    DealerAccNumber = deal.AccountNumber,
+                    FarmerAccNumber = farmer.AccountNumber,
+                    Price = crop.ExpectedPrice,
+                    Quantity = crop.QtyAvailable
+                };
+                receipts.Add(receipt);
+            }
 
             if (invoices.Count < 0)
             {
                 return null;
             }
-            return invoices;
+            return receipts;
         }
-
         private void SendMailFarmer(Invoice invoice, string To, CropDetail crop)
         {
             using (MailMessage message = new MailMessage("dsh1123583@gmail.com", "dsh145002@gmail.com"))
@@ -142,6 +208,6 @@ namespace CaseStudy.Repository
             }
 
         }
-       
+        
     }
 }

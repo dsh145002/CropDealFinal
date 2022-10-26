@@ -27,5 +27,6 @@ namespace CaseStudy.Dtos.CropDto
 
         [Required]
         public string FarmerPhone { get; set; } = null!;
+        public int FarmerId { get; set; }
     }
 }

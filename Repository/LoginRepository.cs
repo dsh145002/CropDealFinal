@@ -31,8 +31,13 @@ namespace CaseStudy.Repository
             }
             else {
 
-                var user = await _context.Users.SingleOrDefaultAsync(a => a.Email == loginUser.username);
-                if (user == null) 
+                var user = await _context.Users.Include("Role")
+                    .SingleOrDefaultAsync(a => a.Email == loginUser.username && a.Role.RoleName==loginUser.role);
+                if (user.Status == "Inactive")
+                {
+                    return HttpStatusCode.BadRequest;
+                }
+                else if (user == null) 
                     return HttpStatusCode.NotFound;
 
                 else if (!VerifyPassword(loginUser.password,user.PasswordHash,user.PasswordSalt))

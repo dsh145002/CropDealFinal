@@ -43,7 +43,7 @@ namespace CaseStudy.Controllers
             var invoices = await _service.FarmerInvoices(fid);
             if (invoices == null)
             {
-                return NoContent();
+                return NotFound();
             }
             else return Ok(invoices);
         }
@@ -54,7 +54,7 @@ namespace CaseStudy.Controllers
             var invoices = await _service.DealerInvoices(did);
             if (invoices == null)
             {
-                return NoContent();
+                return NotFound();
             }
             else return Ok(invoices);
         }
@@ -64,7 +64,7 @@ namespace CaseStudy.Controllers
         //{
         //    var invoice = await _context.Invoices
         //        .SingleOrDefaultAsync(a => a.InvoiceId == id);
-                       
+
         //    if (invoice == null)
         //    {
         //        return NotFound();
@@ -89,6 +89,6 @@ namespace CaseStudy.Controllers
         //    return receipt;
         //}
 
-        
+
     }
 }

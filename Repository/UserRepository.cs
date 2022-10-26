@@ -66,7 +66,10 @@ namespace CaseStudy.Repository
 	{
 		try
 		{
-			var user = await _context.Users.SingleOrDefaultAsync(u => u.UserId == id);
+			var user = await _context.Users
+					.Include("Address")
+					.Include("Account")
+					.SingleOrDefaultAsync(u => u.UserId == id);
 		    if(user == null)	
 			{
 				return null;
@@ -74,17 +77,17 @@ namespace CaseStudy.Repository
                 	user.Email = givenUser.Email;
                 	user.Phone = givenUser.Phone;
 			
-			var address = new Address();
-                	address.Line = givenUser.Line;
-                	address.City = givenUser.City;
-                	address.State = givenUser.State;
-                	user.Address = address;
+			//var address = new Address();
+                	user.Address.Line = givenUser.Line;
+                	user.Address.City = givenUser.City;
+                	user.Address.State = givenUser.State;
+                	//user.Address = address;
 
-			Account acc = new Account();
-                	acc.AccountNumber = givenUser.AccountNumber;
-                	acc.IFSCCode = givenUser.IFSC;
-                	acc.BankName = givenUser.BankName;
-                	user.Account = acc;
+			//Account acc = new Account();
+                	user.Account.AccountNumber = givenUser.AccountNumber;
+                user.Account.IFSCCode = givenUser.IFSC;
+                user.Account.BankName = givenUser.BankName;
+                //	user.Account = acc;
 
 			_context.Update(user);
                 	await _context.SaveChangesAsync();

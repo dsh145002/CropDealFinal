@@ -55,7 +55,7 @@ namespace CaseStudy.Controllers
             return Ok(res);
         }
         [HttpPut("editCrop/{cid}")]
-        public async Task<ActionResult<CropDetail>> AddNewCrop(UpdateCropDto crop, int cid)
+        public async Task<ActionResult<CropDetail>> UpdateCrop(UpdateCropDto crop, int cid)
         {
 
             var res = await _service.EditCropAsync(cid, crop);

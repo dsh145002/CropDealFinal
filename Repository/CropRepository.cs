@@ -71,7 +71,7 @@ namespace CaseStudy.Repository
 
         public async Task<ActionResult<CropDetail>> EditCropAsync(int id, UpdateCropDto crop)
         {
-            var isExistCrop = await _context.CropDetails.FirstOrDefaultAsync(x => x.CropId == id);
+            var isExistCrop = await _context.CropDetails.FirstOrDefaultAsync(x => x.CropId == id && x.FarmerId == crop.FarmerId);
 
             if (isExistCrop != null)
             {
@@ -79,8 +79,9 @@ namespace CaseStudy.Repository
                 isExistCrop.ExpectedPrice = crop.CropExpectedPrice;
                 isExistCrop.Location = crop.CropLocation;
                 isExistCrop.QtyAvailable = crop.CropQtyAvailable;
+                
                 isExistCrop.CropTypeId = (int)Enum.Parse(typeof(CropId), crop.CropType);
-                //_context.Attach(isExistCrop);
+                _context.CropDetails.Update(isExistCrop);
                 await _context.SaveChangesAsync();
                 return isExistCrop;
             }
@@ -102,6 +103,7 @@ namespace CaseStudy.Repository
                 viewCropDto.FarmerName = crop.User.Name;
                 viewCropDto.FarmerPhone = crop.User.Phone;
                 viewCropDto.FarmerEmail = crop.User.Email;
+                viewCropDto.FarmerId = crop.User.UserId;
                 return viewCropDto;
             }
 
