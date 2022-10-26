@@ -21,10 +21,12 @@ namespace CaseStudy.Controllers
     {
         private DatabaseContext _databaseContext;
         LoginService _loginService;
-        public LoginController(DatabaseContext context, LoginService service)
+        IConfiguration _configuration;
+        public LoginController(DatabaseContext context, LoginService service, IConfiguration configuration)
         {
             _databaseContext = context;
             _loginService = service;
+            _configuration = configuration;
         }
 
         [HttpPost]
@@ -80,7 +82,8 @@ namespace CaseStudy.Controllers
                 
             };
 
-            var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("thisisadummytokenkey"));
+            var symmetricKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                _configuration.GetSection("token:key").Value));
             var signCred = new SigningCredentials(symmetricKey,SecurityAlgorithms.HmacSha512);
 
             var token = new JwtSecurityToken(

@@ -16,10 +16,18 @@ namespace CaseStudy.Repository
             Dealer = 2
         }
         DatabaseContext _context;
-        public RegisterRepository(DatabaseContext context)
+        ExceptionRepository _exc;
+        public RegisterRepository(DatabaseContext context, ExceptionRepository exc)
         {
             _context = context;
+            _exc = exc;
         }
+        #region
+        /// <summary>
+        /// Register User
+        /// </summary>
+        /// <param name="newUser"></param>
+        /// <returns></returns>
         public async Task<ActionResult<User>> CreateUserAsync(CreateUserDto newUser)
         {
             try
@@ -58,10 +66,17 @@ namespace CaseStudy.Repository
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error in Registration");
+                await _exc.AddException(e, "Register User in RegisterRepo");
+                return null;
             }
-            return null;
+            finally
+            {
+              
+
+            }
+            
         }
+        #endregion
         private bool VerifyPassword(string password, byte[] passwordHash, byte[] passwordSalt)
         {
             using (var hmac = new HMACSHA512(passwordSalt))

@@ -11,44 +11,61 @@ namespace CaseStudy.Repository
     public class LoginRepository : ILoginRepository
     {
         DatabaseContext _context;
-        public LoginRepository(DatabaseContext context)
+        ExceptionRepository _exception;
+        public LoginRepository(DatabaseContext context,ExceptionRepository exception)
         {
             _context = context;
+            _exception = exception;
         }
+        #region
+        /// <summary>
+        /// Login method
+        /// </summary>
+        /// <param name="loginUser"></param>
+        /// <returns></returns>
         public async Task<HttpStatusCode> Login(LoginDto loginUser)
         {
-            if(loginUser.role == "Admin")
+            try
             {
-                var user = await _context.Admins.SingleOrDefaultAsync(a => a.Email == loginUser.username);
-                if (user == null) 
-                    return HttpStatusCode.NotFound;
-
-                else if (!user.Password.Equals(loginUser.password))
+                if (loginUser.role == "Admin")
                 {
-                    return HttpStatusCode.Unauthorized;
+                    var user = await _context.Admins.SingleOrDefaultAsync(a => a.Email == loginUser.username);
+                    if (user == null)
+                        return HttpStatusCode.NotFound;
+
+                    else if (!user.Password.Equals(loginUser.password))
+                    {
+                        return HttpStatusCode.Unauthorized;
+                    }
+                    return HttpStatusCode.OK;
                 }
-                return HttpStatusCode.OK;
+                else
+                {
+
+                    var user = await _context.Users.Include("Role")
+                        .SingleOrDefaultAsync(a => a.Email == loginUser.username && a.Role.RoleName == loginUser.role);
+                    if (user.Status == "Inactive")
+                    {
+                        return HttpStatusCode.BadRequest;
+                    }
+                    else if (user == null)
+                        return HttpStatusCode.NotFound;
+
+                    else if (!VerifyPassword(loginUser.password, user.PasswordHash, user.PasswordSalt))
+                    {
+                        return HttpStatusCode.Unauthorized;
+                    }
+                    return HttpStatusCode.OK;
+
+                }
             }
-            else {
-
-                var user = await _context.Users.Include("Role")
-                    .SingleOrDefaultAsync(a => a.Email == loginUser.username && a.Role.RoleName==loginUser.role);
-                if (user.Status == "Inactive")
-                {
-                    return HttpStatusCode.BadRequest;
-                }
-                else if (user == null) 
-                    return HttpStatusCode.NotFound;
-
-                else if (!VerifyPassword(loginUser.password,user.PasswordHash,user.PasswordSalt))
-                {
-                    return HttpStatusCode.Unauthorized;
-                }
-                return HttpStatusCode.OK;
-                
+            catch (Exception e)
+            {
+                await _exception.AddException(e, "Login method");
             }
-            
+            return HttpStatusCode.BadRequest;
         }
+        #endregion
         private bool VerifyPassword(string password, byte[] passwordHash, byte[] passwordSalt)
         {
             using (var hmac = new HMACSHA512(passwordSalt))

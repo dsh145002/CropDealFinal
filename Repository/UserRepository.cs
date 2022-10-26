@@ -22,12 +22,17 @@ namespace CaseStudy.Repository
 		}
 
 		DatabaseContext _context;
-
-		public UserRepository(DatabaseContext context)
+		ExceptionRepository _exc;
+		public UserRepository(DatabaseContext context, ExceptionRepository exc)
 		{
 			_context = context;
+			_exc = exc;
 		}
-
+		#region
+/// <summary>
+/// Get list of Users
+/// </summary>
+/// <returns></returns>
 		public async Task<IEnumerable<User>> GetUsersAsync()
 		{
 			try
@@ -37,12 +42,19 @@ namespace CaseStudy.Repository
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("Error in Returning the Users");
-			}
-			return null;
-		}
+				await _exc.AddException(e, "GetUsers in UserRepo");           
+            }
+            return null;
+        }
+        #endregion
 
-		public async Task<ActionResult<User>> GetUserByIDAsync(int id)
+        #region
+		/// <summary>
+		/// Get Users By Id
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+        public async Task<ActionResult<User>> GetUserByIDAsync(int id)
 		{
 			try
 			{
@@ -56,13 +68,22 @@ namespace CaseStudy.Repository
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("The user with the given Id could not be found");
-			}
+				await _exc.AddException(e, "GetUserById in UserRepo");
+                
+            }
 			return null;
 
 		}
+        #endregion
 
-		public async Task<ActionResult<User>> UpdateUserAsync(UpdateUserDto givenUser, int id)
+        #region
+		/// <summary>
+		/// Updating the user
+		/// </summary>
+		/// <param name="givenUser"></param>
+		/// <param name="id"></param>
+		/// <returns></returns>
+        public async Task<ActionResult<User>> UpdateUserAsync(UpdateUserDto givenUser, int id)
 		{
 			try
 			{
@@ -95,13 +116,18 @@ namespace CaseStudy.Repository
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("Could not update the user details");
+				await _exc.AddException(e, "Update User in UserRepo");
 			}
 			return null;
 		}
-
-		[Authorize]
-		public async Task<HttpStatusCode> DeleteUserAsync(int id)
+        #endregion
+        #region Delete User
+        /// <summary>
+        /// Delete specific User
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<HttpStatusCode> DeleteUserAsync(int id)
 		{
 			try
 			{
@@ -111,13 +137,19 @@ namespace CaseStudy.Repository
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("Could not delete user");
-			}
+                await _exc.AddException(e, "DeleteUser in UserRepo");
+            }
 			return HttpStatusCode.NotFound;
 		}
-
-		[Authorize]
-		public async Task<ActionResult<User>> StatusUpdateAsync(string stat, int id)
+        #endregion
+        #region UpdateStatus
+        /// <summary>
+        /// Update the status of User
+        /// </summary>
+        /// <param name="stat"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ActionResult<User>> StatusUpdateAsync(string stat, int id)
 		{
 			try
 			{
@@ -129,13 +161,20 @@ namespace CaseStudy.Repository
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("Could not change the status");
-			}
+                await _exc.AddException(e, "UpdateStatus in UserRepo");
+            }
 			return null;
 		}
 
-		[Authorize]
-		public async Task<HttpStatusCode> AddRatingAsync(RatingDto ratinginfo, int id)
+        #endregion
+        #region AddRating
+		/// <summary>
+		/// Give Rating to Farmer only
+		/// </summary>
+		/// <param name="ratinginfo"></param>
+		/// <param name="id"></param>
+		/// <returns></returns>
+        public async Task<HttpStatusCode> AddRatingAsync(RatingDto ratinginfo, int id)
 		{
 			try {
 				Rating rating = new Rating();
@@ -148,43 +187,34 @@ namespace CaseStudy.Repository
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("Could not add rating");
-			}
+                await _exc.AddException(e, "AddRating in UserRepo");
+            }
 			return HttpStatusCode.BadRequest;
 		}
-
-		[Authorize]
-		public async Task<HttpStatusCode> UpdateRatingAsync(RatingDto ratinginfo, int id)
+        #endregion
+        
+		
+		#region AvgRating
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+        public async Task<Double> AvgUserRating(int id)
 		{
 			try
 			{
-				var rating = await _context.Ratings.SingleOrDefaultAsync(r => r.UserId == id);
-				if (rating == null)
-				{
-					return HttpStatusCode.NotFound;
-				}
-				rating.TotalRating = ratinginfo.TotalRating;
-				rating.Review = ratinginfo.Review;
-
-				_context.Ratings.Update(rating);
-				await _context.SaveChangesAsync();
-				return HttpStatusCode.OK;
+				var avg = await _context.Ratings
+						.Where(p => p.UserId == id)
+						.AverageAsync(p => p.TotalRating);
+				return avg;
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine("could not update rating");
-			}
-			return HttpStatusCode.BadRequest;
+                await _exc.AddException(e, "Average Rating in UserRepo");
+            }
+			return 0.0;
 		}
-	
-	[Authorize]
-	public async Task<Double> AvgUserRating(int id)
-	{
-			
-			var avg = await _context.Ratings
-					.Where(p => p.UserId == id)
-					.AverageAsync(p => p.TotalRating);
-			return avg;
-	}
-}
+        #endregion
+    }
 }

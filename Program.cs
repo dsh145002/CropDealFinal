@@ -56,6 +56,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<UserService, UserService>();
 builder.Services.AddScoped<InvoiceRepository, InvoiceRepository>();
 builder.Services.AddScoped<InvoiceService, InvoiceService>();
+builder.Services.AddScoped<ExceptionRepository, ExceptionRepository>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
     options =>

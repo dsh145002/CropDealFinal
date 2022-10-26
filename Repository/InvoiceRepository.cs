@@ -13,201 +13,232 @@ namespace CaseStudy.Repository
     public class InvoiceRepository
     {
         DatabaseContext _context;
-        public InvoiceRepository(DatabaseContext cotnext)
+        ExceptionRepository _exception;
+        public InvoiceRepository(DatabaseContext cotnext, ExceptionRepository exception)
         {
             _context = cotnext;
+            _exception = exception;
         }
-
+        #region CreateInvoice
+        /// <summary>
+        /// Creates a new Invoice
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public async Task<ActionResult<Invoice>> CreateInvoice(InvoiceDto data)
         {
-            var farm = _context.Users.SingleOrDefault(a => a.UserId == data.FarmerId);
-            var deal = _context.Users.SingleOrDefault(a => a.UserId == data.DealerId);
-
-            var crop = _context.CropDetails.Include("CropType")
-                .SingleOrDefault(a => a.CropId == data.CropId);
-            
-            var invoice = new Invoice();
-            invoice.Amount = crop.ExpectedPrice;
-            invoice.DealerId = data.DealerId;
-            invoice.FarmerId = data.FarmerId;
-            invoice.CropId = data.CropId;
-            invoice.InvoiceDate = DateTime.Now;
-
-            _context.Invoices.Add(invoice);
-            await _context.SaveChangesAsync();
-
-            
-
-            if(farm==null || deal==null)
+            try
             {
+                var farm = _context.Users.SingleOrDefault(a => a.UserId == data.FarmerId);
+                var deal = _context.Users.SingleOrDefault(a => a.UserId == data.DealerId);
+
+                var crop = _context.CropDetails.Include("CropType")
+                    .SingleOrDefault(a => a.CropId == data.CropId);
+
+                var invoice = new Invoice();
+                invoice.Amount = crop.ExpectedPrice;
+                invoice.DealerId = data.DealerId;
+                invoice.FarmerId = data.FarmerId;
+                invoice.CropId = data.CropId;
+                invoice.InvoiceDate = DateTime.Now;
+
+                _context.Invoices.Add(invoice);
+                await _context.SaveChangesAsync();
+
+
+
+                if (farm == null || deal == null)
+                {
+                    return null;
+                }
+
+                //Sending to Farmer Receipt
+                SendMailFarmer(invoice, farm.Email, crop);
+                //Sending to Dealer Invoice
+                SendMailDealer(invoice, deal.Email, crop);
+
+                return invoice;
+            }
+            catch(Exception e)
+            {
+                await _exception.AddException(e, "CreateInvoice in InvoiceRepo");
                 return null;
             }
-            
-            //Sending to Farmer Receipt
-            SendMailFarmer(invoice, farm.Email, crop);
-            //Sending to Dealer Invoice
-            SendMailDealer(invoice, deal.Email, crop);
-
-            return invoice;
         }
+        #endregion
 
+        #region FarmerInvoices
+        /// <summary>
+        /// Invoices Based on Id for farmer
+        /// </summary>
+        /// <param name="fid"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<FarmerReceipt>> FarmerInvoices(int fid)
         {
-            var invoices = await _context.Invoices.Where(a => a.FarmerId == fid)
-                .OrderBy(p=>p.InvoiceDate)
-                //.Select(p => new FarmerReceipt()
-                //{
-                //    InvoiceDate = DateTime.Now,
-                //    InvoiceId = p.InvoiceId,
-                //    CropName= _context.CropDetails.SingleOrDefault(a => a.CropId == p.CropId).CropName,
-                //    CropType = _context.CropDetails.Include("CropType").SingleOrDefault(a => a.CropId == p.CropId).CropType.TypeName,
-                //    FarmerAccNumber= _context.Accounts.SingleOrDefault(a => a.UserId == fid).AccountNumber,
-                //    DealerAccNumber = _context.Accounts.SingleOrDefault(a => a.UserId == p.DealerId).AccountNumber,
-                //    Quantity = _context.CropDetails.SingleOrDefault(a => a.CropId == p.CropId).QtyAvailable,
-                //    Price = _context.CropDetails.SingleOrDefault(a => a.CropId == p.CropId).ExpectedPrice
-                //})
-                .ToListAsync();
-            var receipts = new List<FarmerReceipt>();
-            foreach(Invoice p in invoices)
-            {
-                var crop = _context.CropDetails.Include("CropType").SingleOrDefault(a => a.CropId == p.CropId);
-                var farmer = _context.Accounts.SingleOrDefault(a => a.UserId == fid);
-                var deal = _context.Accounts.SingleOrDefault(a => a.UserId == p.DealerId);
-
-                var receipt = new FarmerReceipt()
+            try {
+                var invoices = await _context.Invoices.Where(a => a.FarmerId == fid)
+                    .OrderBy(p => p.InvoiceDate)
+                    .ToListAsync();
+                var receipts = new List<FarmerReceipt>();
+                foreach (Invoice p in invoices)
                 {
-                    InvoiceDate = p.InvoiceDate,
-                    InvoiceId = p.InvoiceId,
-                    CropName = crop.CropName,
-                    CropType = crop.CropType.TypeName,
-                    DealerAccNumber = deal.AccountNumber,
-                    FarmerAccNumber = farmer.AccountNumber,
-                    Price = crop.ExpectedPrice,
-                    Quantity = crop.QtyAvailable
-                };
-                receipts.Add(receipt);
-            }
+                    var crop = _context.CropDetails.Include("CropType").SingleOrDefault(a => a.CropId == p.CropId);
+                    var farmer = _context.Accounts.SingleOrDefault(a => a.UserId == fid);
+                    var deal = _context.Accounts.SingleOrDefault(a => a.UserId == p.DealerId);
 
-            if (invoices.Count < 0)
+                    var receipt = new FarmerReceipt()
+                    {
+                        InvoiceDate = p.InvoiceDate,
+                        InvoiceId = p.InvoiceId,
+                        CropName = crop.CropName,
+                        CropType = crop.CropType.TypeName,
+                        DealerAccNumber = deal.AccountNumber,
+                        FarmerAccNumber = farmer.AccountNumber,
+                        Price = crop.ExpectedPrice,
+                        Quantity = crop.QtyAvailable
+                    };
+                    receipts.Add(receipt);
+                }
+
+                if (invoices.Count < 0)
+                {
+                    return null;
+                }
+                return receipts;
+            }
+            catch (Exception e)
             {
+                await _exception.AddException(e, "FarmerInvoices in InvoiceRepo");
                 return null;
             }
-            return receipts;
         }
+        #endregion
+
+        #region
+        /// <summary>
+        /// Invoices Based on Id for Dealer
+        /// </summary>
+        /// <param name="did"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<FarmerReceipt>> DealerInvoices(int did)
         {
-            var invoices = await _context.Invoices.Where(a => a.DealerId == did)
-                .Select(p => new FarmerReceipt()
-                {
-                    InvoiceDate = p.InvoiceDate,
-                    InvoiceId = p.InvoiceId,
-                    CropName = _context.CropDetails.SingleOrDefault(a => a.CropId == p.CropId).CropName,
-                    CropType = _context.CropDetails.Include("CropType").SingleOrDefault(a => a.CropId == p.CropId).CropType.TypeName,
-                    FarmerAccNumber = _context.Accounts.SingleOrDefault(a => a.UserId == p.FarmerId).AccountNumber,
-                    DealerAccNumber = _context.Accounts.SingleOrDefault(a => a.UserId == did).AccountNumber,
-                    Quantity = _context.CropDetails.SingleOrDefault(a => a.CropId == p.CropId).QtyAvailable,
-                    Price = _context.CropDetails.SingleOrDefault(a => a.CropId == p.CropId).ExpectedPrice
-                })
-                .ToListAsync();
-
-            if (invoices.Count < 0)
+            try
             {
+                var invoices = await _context.Invoices.Where(a => a.DealerId == did)
+                    .Select(p => new FarmerReceipt()
+                    {
+                        InvoiceDate = p.InvoiceDate,
+                        InvoiceId = p.InvoiceId,
+                        CropName = _context.CropDetails.SingleOrDefault(a => a.CropId == p.CropId).CropName,
+                        CropType = _context.CropDetails.Include("CropType").SingleOrDefault(a => a.CropId == p.CropId).CropType.TypeName,
+                        FarmerAccNumber = _context.Accounts.SingleOrDefault(a => a.UserId == p.FarmerId).AccountNumber,
+                        DealerAccNumber = _context.Accounts.SingleOrDefault(a => a.UserId == did).AccountNumber,
+                        Quantity = _context.CropDetails.SingleOrDefault(a => a.CropId == p.CropId).QtyAvailable,
+                        Price = _context.CropDetails.SingleOrDefault(a => a.CropId == p.CropId).ExpectedPrice
+                    })
+                    .ToListAsync();
+
+                if (invoices.Count < 0)
+                {
+                    return null;
+                }
+                return invoices;
+            }
+            catch(Exception e)
+            {
+                await _exception.AddException(e, "DealerInvoices in InvoiceRepo");
                 return null;
             }
-            return invoices;
         }
-        public async Task<IEnumerable<FarmerReceipt>> GetInvoices()
+        #endregion
+        #region
+        /// <summary>
+        /// Send Email to Farmer
+        /// </summary>
+        /// <param name="invoice"></param>
+        /// <param name="To"></param>
+        /// <param name="crop"></param>
+        public async void SendMailFarmer(Invoice invoice, string To, CropDetail crop)
         {
-            var invoices =await  _context.Invoices
-                .OrderBy(p=>p.InvoiceDate)
-                .ToListAsync();
-            var receipts = new List<FarmerReceipt>();
-            foreach (Invoice p in invoices)
+            try
             {
-                var crop = _context.CropDetails.Include("CropType").SingleOrDefault(a => a.CropId == p.CropId);
-                var farmer = _context.Accounts.SingleOrDefault(a => a.UserId == p.FarmerId);
-                var deal = _context.Accounts.SingleOrDefault(a => a.UserId == p.DealerId);
-
-                var receipt = new FarmerReceipt()
+                using (MailMessage message = new MailMessage("dsh1123583@gmail.com", "dsh145002@gmail.com"))
                 {
-                    InvoiceDate = DateTime.Now,
-                    InvoiceId = p.InvoiceId,
-                    CropName = crop.CropName,
-                    CropType = crop.CropType.TypeName,
-                    DealerAccNumber = deal.AccountNumber,
-                    FarmerAccNumber = farmer.AccountNumber,
-                    Price = crop.ExpectedPrice,
-                    Quantity = crop.QtyAvailable
-                };
-                receipts.Add(receipt);
-            }
+                    message.Body = "Successfull Transaction" +
+                        $"Crop Name: {crop.CropName}\n" +
+                        $"Crop Type: {crop.CropType.TypeName}\n" +
+                        $"Crop Qty: {crop.QtyAvailable}\n" +
+                        $"Your Account Number: {crop.CropName}\n" +
+                        $"Dealer Account Number: {crop.CropName}\n" +
+                        $"Amount: {invoice.Amount}\n" +
+                        $"Invoice Id: {invoice.InvoiceId}\n"
+                        ;
 
-            if (invoices.Count < 0)
-            {
-                return null;
-            }
-            return receipts;
-        }
-        private void SendMailFarmer(Invoice invoice, string To, CropDetail crop)
-        {
-            using (MailMessage message = new MailMessage("dsh1123583@gmail.com", "dsh145002@gmail.com"))
-            {
-                message.Body = "Successfull Transaction" +
-                    $"Crop Name: {crop.CropName}\n" +
-                    $"Crop Type: {crop.CropType.TypeName}\n" +
-                    $"Crop Qty: {crop.QtyAvailable}\n" +
-                    $"Your Account Number: {crop.CropName}\n" +
-                    $"Dealer Account Number: {crop.CropName}\n" +
-                    $"Amount: {invoice.Amount}\n" +
-                    $"Invoice Id: {invoice.InvoiceId}\n"
-                    ;
+                    message.Subject = "Here Is Your Receipt";
+                    message.IsBodyHtml = false;
 
-                message.Subject = "Here Is Your Receipt";
-                message.IsBodyHtml = false;
-
-                using (SmtpClient smtp = new SmtpClient())
-                {
-                    smtp.Host = "smtp.gmail.com";
-                    smtp.EnableSsl = true;
-                    NetworkCredential cred = new NetworkCredential("dsh1123583@gmail.com", "zqvbjjlrrukhjumc");
-                    smtp.UseDefaultCredentials = false;
-                    smtp.Credentials = cred;
-                    smtp.Port = 587;
-                    smtp.Send(message);
+                    using (SmtpClient smtp = new SmtpClient())
+                    {
+                        smtp.Host = "smtp.gmail.com";
+                        smtp.EnableSsl = true;
+                        NetworkCredential cred = new NetworkCredential("dsh1123583@gmail.com", "zqvbjjlrrukhjumc");
+                        smtp.UseDefaultCredentials = false;
+                        smtp.Credentials = cred;
+                        smtp.Port = 587;
+                        smtp.Send(message);
+                    }
                 }
             }
-
-        }
-        private void SendMailDealer(Invoice invoice, string To, CropDetail crop)
-        {
-            using (MailMessage message = new MailMessage("dsh1123583@gmail.com", "dsh145002@gmail.com"))
+            catch (Exception e)
             {
-                message.Body = "Successfull Transaction" +
-                    $"Crop Name: {crop.CropName}\n" +
-                    $"Crop Type: {crop.CropType.TypeName}\n" +
-                    $"Crop Qty: {crop.QtyAvailable}\n" +
-                    $"Farmer Account Number: {crop.CropName}\n" +
-                    $"Your Account Number: {crop.CropName}\n" +
-                    $"Amount: {invoice.Amount}\n" +
-                    $"Invoice Id: {invoice.InvoiceId}\n"
-                    ;
+              await  _exception.AddException(e, "Send Email to Farmer in InvoiceRepo");
+            }
+        }
+        #endregion
 
-                message.Subject = "Here Is Your Receipt";
-                message.IsBodyHtml = false;
-
-                using (SmtpClient smtp = new SmtpClient())
+        #region
+        /// <summary>
+        /// SEnd email to Dealer
+        /// </summary>
+        /// <param name="invoice"></param>
+        /// <param name="To"></param>
+        /// <param name="crop"></param>
+        public async void SendMailDealer(Invoice invoice, string To, CropDetail crop)
+        {
+            try
+            {
+                using (MailMessage message = new MailMessage("dsh1123583@gmail.com", "dsh145002@gmail.com"))
                 {
-                    smtp.Host = "smtp.gmail.com";
-                    smtp.EnableSsl = true;
-                    NetworkCredential cred = new NetworkCredential("dsh1123583@gmail.com", "zqvbjjlrrukhjumc");
-                    smtp.UseDefaultCredentials = false;
-                    smtp.Credentials = cred;
-                    smtp.Port = 587;
-                    smtp.Send(message);
+                    message.Body = "Successfull Transaction" +
+                        $"Crop Name: {crop.CropName}\n" +
+                        $"Crop Type: {crop.CropType.TypeName}\n" +
+                        $"Crop Qty: {crop.QtyAvailable}\n" +
+                        $"Farmer Account Number: {crop.CropName}\n" +
+                        $"Your Account Number: {crop.CropName}\n" +
+                        $"Amount: {invoice.Amount}\n" +
+                        $"Invoice Id: {invoice.InvoiceId}\n"
+                        ;
+
+                    message.Subject = "Here Is Your Receipt";
+                    message.IsBodyHtml = false;
+
+                    using (SmtpClient smtp = new SmtpClient())
+                    {
+                        smtp.Host = "smtp.gmail.com";
+                        smtp.EnableSsl = true;
+                        NetworkCredential cred = new NetworkCredential("dsh1123583@gmail.com", "zqvbjjlrrukhjumc");
+                        smtp.UseDefaultCredentials = false;
+                        smtp.Credentials = cred;
+                        smtp.Port = 587;
+                        smtp.Send(message);
+                    }
                 }
             }
-
+            catch (Exception e)
+            {
+               await _exception.AddException(e, "Send Email to Dealer in InvoiceRepo");
+            }
         }
-        
+        #endregion
     }
 }

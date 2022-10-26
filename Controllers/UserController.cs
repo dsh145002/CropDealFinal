@@ -16,12 +16,12 @@ namespace CaseStudy.Controllers
     {
         private RegisterService _registerService;
         private UserService _userService;
-        private IMapper _mapper;
-        public UserController(RegisterService registerService, UserService userService, IMapper mapper)
+        
+        public UserController(RegisterService registerService, UserService userService)
         {
             _registerService = registerService;
             _userService = userService;
-            _mapper = mapper;
+            
         }
         [HttpPost("register")]
         [AllowAnonymous]
@@ -35,6 +35,7 @@ namespace CaseStudy.Controllers
             }
             return Ok(res);
         }
+
         [HttpGet("getUsers")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
@@ -105,8 +106,7 @@ namespace CaseStudy.Controllers
             }
             return Ok(res);
         }
-
-              
+ 
      
         [HttpGet("getRating/{id}")]
         [Authorize]

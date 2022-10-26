@@ -13,7 +13,9 @@ namespace CaseStudy.Models
          public DbSet<CropType> CropTypes { get;set;}= null!;
         public DbSet<CropDetail>  CropDetails { get;set;}= null!;
         public DbSet<Invoice> Invoices { get; set; } = null!;
-        public DbSet<Admin> Admins { get; set; }
+        public DbSet<Admin> Admins { get; set; } = null!;
+        public DbSet<ExceptionError> ExceptionErrors { get; set; } = null!;
+    
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(@"data source=.\sqlexpress;database=model;integrated security=SSPI");
@@ -21,6 +23,38 @@ namespace CaseStudy.Models
         } 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //modelBuilder.Entity<Role>().HasData(
+            //        new Role
+            //        {
+            //            RoleId = 1,
+            //            RoleName = "Farmer"
+            //        },
+            //         new Role
+            //         {
+            //             RoleId = 2,
+            //             RoleName = "Dealer"
+            //         }
+            //    );
+
+            //modelBuilder.Entity<CropType>().HasData(
+            //       new CropType
+            //       {
+            //           CropTypeId = 1,
+            //           TypeName = "Fruit"
+            //       },
+            //        new CropType
+            //        {
+            //            CropTypeId = 2,
+            //            TypeName = "Vegetable"
+            //        },
+            //        new CropType
+            //        {
+            //            CropTypeId = 3,
+            //            TypeName = "Grain"
+            //        }
+            //   );
+
+       
 
             modelBuilder.Entity<Invoice>(
                 entity =>
