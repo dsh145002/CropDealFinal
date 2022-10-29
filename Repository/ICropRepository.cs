@@ -12,5 +12,6 @@ namespace CaseStudy.Repository
 
         Task<ActionResult<CropDetail>> EditCropAsync(int id, UpdateCropDto crop);
         Task<ActionResult<ViewCropDto>> ViewCropByIdAsync(int id);
+        Task CropImage(string path, int cid);
     }
 }

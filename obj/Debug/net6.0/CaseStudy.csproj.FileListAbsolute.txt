@@ -71,3 +71,4 @@ C:\Users\Devendra Sharma\Downloads\Dot Net Full Stack\Csharp\.netCore\CaseStudy\
 C:\Users\Devendra Sharma\Downloads\Dot Net Full Stack\Csharp\.netCore\CaseStudy\obj\Debug\net6.0\ref\CaseStudy.dll
 C:\Users\Devendra Sharma\Downloads\Dot Net Full Stack\Csharp\.netCore\CaseStudy\bin\Debug\net6.0\AutoMapper.dll
 C:\Users\Devendra Sharma\Downloads\Dot Net Full Stack\Csharp\.netCore\CaseStudy\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+C:\Users\Devendra Sharma\Downloads\Dot Net Full Stack\Csharp\.netCore\CaseStudy\bin\Debug\net6.0\CaseStudy.staticwebassets.runtime.json

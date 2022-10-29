@@ -14,6 +14,7 @@ namespace CaseStudy.Models
         [JsonIgnore]
         public User User { get; set; }
         public string CropName { get; set; } = null!;
+        public string? CropImage { get; set; }
         public string Location { get; set; } = null!;
         public int QtyAvailable { get; set; }
         public decimal ExpectedPrice { get; set; }

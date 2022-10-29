@@ -1,11 +1,71 @@
 {
   "Version": 1,
-  "Hash": "owZJh8wwTWYaMDRGRg60HL9vlVTskzykSC6owgwQ3ls=",
+  "Hash": "Qxf/IU6WsCt4BEf91A3sKYl77gX8BGMsmdGWGslEgHE=",
   "Source": "CaseStudy",
   "BasePath": "_content/CaseStudy",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": []
+  "DiscoveryPatterns": [
+    {
+      "Name": "CaseStudy\\wwwroot",
+      "Source": "CaseStudy",
+      "ContentRoot": "C:\\Users\\Devendra Sharma\\Downloads\\Dot Net Full Stack\\Csharp\\.netCore\\CaseStudy\\wwwroot\\",
+      "BasePath": "_content/CaseStudy",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\Users\\Devendra Sharma\\Downloads\\Dot Net Full Stack\\Csharp\\.netCore\\CaseStudy\\wwwroot\\image\\football.jpg",
+      "SourceId": "CaseStudy",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Devendra Sharma\\Downloads\\Dot Net Full Stack\\Csharp\\.netCore\\CaseStudy\\wwwroot\\",
+      "BasePath": "_content/CaseStudy",
+      "RelativePath": "image/football.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\image\\football.jpg"
+    },
+    {
+      "Identity": "C:\\Users\\Devendra Sharma\\Downloads\\Dot Net Full Stack\\Csharp\\.netCore\\CaseStudy\\wwwroot\\uploads\\crops\\2010\\image.jpg",
+      "SourceId": "CaseStudy",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Devendra Sharma\\Downloads\\Dot Net Full Stack\\Csharp\\.netCore\\CaseStudy\\wwwroot\\",
+      "BasePath": "_content/CaseStudy",
+      "RelativePath": "uploads/crops/2010/image.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\crops\\2010\\image.jpg"
+    },
+    {
+      "Identity": "C:\\Users\\Devendra Sharma\\Downloads\\Dot Net Full Stack\\Csharp\\.netCore\\CaseStudy\\wwwroot\\uploads\\crops\\2011\\image.jpg",
+      "SourceId": "CaseStudy",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Devendra Sharma\\Downloads\\Dot Net Full Stack\\Csharp\\.netCore\\CaseStudy\\wwwroot\\",
+      "BasePath": "_content/CaseStudy",
+      "RelativePath": "uploads/crops/2011/image.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\crops\\2011\\image.jpg"
+    }
+  ]
 }

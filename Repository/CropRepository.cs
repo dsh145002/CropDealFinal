@@ -39,6 +39,7 @@ namespace CaseStudy.Repository
                 cropDetail.QtyAvailable = crop.CropQtyAvailable;
                 cropDetail.Location = crop.CropLocation;
                 cropDetail.ExpectedPrice = crop.CropExpectedPrice;
+                cropDetail.CropImage="image.png";
                 cropDetail.FarmerId = crop.fid;
 
                 cropDetail.CropTypeId = (int)Enum.Parse(typeof(CropId), crop.CropType);
@@ -157,12 +158,26 @@ namespace CaseStudy.Repository
                     viewCropDto.CropType = crop.CropType.TypeName;
                     viewCropDto.CropName = crop.CropName;
                     viewCropDto.CropLocation = crop.Location;
+                    viewCropDto.CropImg = crop.CropImage;
                     viewCropDto.CropQtyAvailable = crop.QtyAvailable;
                     viewCropDto.CropExpectedPrice = crop.ExpectedPrice;
                     viewCropDto.FarmerName = crop.User.Name;
                     viewCropDto.FarmerPhone = crop.User.Phone;
                     viewCropDto.FarmerEmail = crop.User.Email;
                     viewCropDto.FarmerId = crop.User.UserId;
+
+                    var rat = _context.Ratings.FirstOrDefault(p => p.UserId == crop.User.UserId);
+                    if(rat == null)
+                    {
+                        viewCropDto.FarmerRating = "No Rating";
+                    }
+                    else
+                    {
+                        viewCropDto.FarmerRating = _context.Ratings
+                        .Where(p => p.UserId == crop.User.UserId)
+                        .Average(p => p.TotalRating).ToString();
+                    }
+
                     return viewCropDto;
                 }
                 return null;
@@ -175,5 +190,13 @@ namespace CaseStudy.Repository
             
         }
         #endregion
+
+        public async Task CropImage(string path,int cid)
+        {
+            var crop = await _context.CropDetails.SingleOrDefaultAsync(p => p.CropId == cid);
+            crop.CropImage = path;
+            _context.CropDetails.Update(crop);
+            await _context.SaveChangesAsync();
+        }
     }
 }

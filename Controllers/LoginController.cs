@@ -28,53 +28,75 @@ namespace CaseStudy.Controllers
             _loginService = service;
             _configuration = configuration;
         }
-
+        #region Login
+        /// <summary>
+        /// Login method
+        /// </summary>
+        /// <param name="loginData"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult<Tokens>> Login(LoginDto loginData)
         {
-            var res = await _loginService.Login(loginData);
-
-            if (res == HttpStatusCode.OK)
+            try
             {
-                
-                if (loginData.role == "Admin")
-                {
-                    string userId = _databaseContext.Admins.SingleOrDefault(a => a.Email == loginData.username).AdminId.ToString();
-                    var token = GenerateToken(loginData);
-                    
-                    return new Tokens{ Role = loginData.role,
-                    UserId = userId,Token=token };
-                }
-                else
-                {
-                    string userId = _databaseContext.Users.SingleOrDefault(a => a.Email == loginData.username).UserId.ToString();
-                    var token = GenerateToken(loginData);
+                var res = await _loginService.Login(loginData);
 
-                    return new Tokens
+                if (res == HttpStatusCode.OK)
+                {
+
+                    if (loginData.role == "Admin")
                     {
-                        Role = loginData.role,
-                        UserId = userId,
-                        Token = token
-                    };
+                        string userId = _databaseContext.Admins.SingleOrDefault(a => a.Email == loginData.username).AdminId.ToString();
+                        var token = GenerateToken(loginData);
+
+                        return new Tokens
+                        {
+                            Role = loginData.role,
+                            UserId = userId,
+                            Token = token
+                        };
+                    }
+                    else
+                    {
+                        string userId = _databaseContext.Users.SingleOrDefault(a => a.Email == loginData.username).UserId.ToString();
+                        var token = GenerateToken(loginData);
+
+                        return new Tokens
+                        {
+                            Role = loginData.role,
+                            UserId = userId,
+                            Token = token
+                        };
+                    }
                 }
-               
-            }
-            else if (res == HttpStatusCode.Unauthorized)
-            {
-                return Unauthorized("Wrong Password!!");
-            }
-            else if (res == HttpStatusCode.NotFound)
-            {
-                return BadRequest("User not Found. Check username or Register");
-            }
 
-            return BadRequest("Some Error Occured"); 
-            
+                else if (res == HttpStatusCode.Unauthorized)
+                {
+                    return Unauthorized("Wrong Password!!");
+                }
+                else if (res == HttpStatusCode.NotFound)
+                {
+                    return BadRequest("User not Found. Check username or Register");
+                }
+
+                return BadRequest("Some Error Occured");
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
+        #endregion
 
-
+        #region TokenGeneration
+        /// <summary>
+        /// Generate TOken
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         private string GenerateToken(LoginDto user)
         {
+            try { 
             IEnumerable<Claim> claims = new List<Claim>
             {
                 new Claim("email",user.username),
@@ -93,7 +115,12 @@ namespace CaseStudy.Controllers
 
             
             return new JwtSecurityTokenHandler().WriteToken(token);
+            }catch(Exception e)
+            {
+                throw;
+            }
         }
-       
+        #endregion
+
     }
 }

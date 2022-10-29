@@ -36,5 +36,9 @@ namespace CaseStudy.Services
         {
             return await _repo.ViewCropByIdAsync(id);
         }
+        public async Task CropImage(string path, int cid)
+        {
+            await _repo.CropImage(path, cid);
+        }
     }
 }

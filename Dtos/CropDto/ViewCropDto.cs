@@ -28,5 +28,7 @@ namespace CaseStudy.Dtos.CropDto
         [Required]
         public string FarmerPhone { get; set; } = null!;
         public int FarmerId { get; set; }
+        public string CropImg { get; set; }
+        public string FarmerRating { get; set; } 
     }
 }

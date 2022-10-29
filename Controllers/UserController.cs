@@ -23,32 +23,57 @@ namespace CaseStudy.Controllers
             _userService = userService;
             
         }
+        #region Register
+        /// <summary>
+        /// Register User
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         [HttpPost("register")]
         [AllowAnonymous]
         public async Task<ActionResult<User>> Register(CreateUserDto user)
         {
-
-            var res = await _registerService.RegisterUser(user);
-            if (res == null)
+            try
             {
-                return BadRequest();
+                var res = await _registerService.RegisterUser(user);
+                if (res == null)
+                {
+                    return BadRequest();
+                }
+                return Ok(res);
             }
-            return Ok(res);
+            catch (Exception e)
+            {
+                throw;
+            }
         }
+        #endregion
 
+        #region GetUsers
+        /// <summary>
+        /// List of Users
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("getUsers")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            var res = await _userService.DisplayUsers();
-            
-            if (res == null)
+            try
             {
-                return BadRequest();
+                var res = await _userService.DisplayUsers();
+
+                if (res == null)
+                {
+                    return BadRequest();
+                }
+
+                return Ok(res);
             }
-
-           return Ok(res);
+            catch (Exception e)
+            {
+                throw;
+            }
         }
-
+        #endregion
         [HttpGet("getuser/{id}")]
         public async Task<ActionResult<User>> GetByID(int id)
         {

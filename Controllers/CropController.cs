@@ -76,5 +76,27 @@ namespace CaseStudy.Controllers
             }
             return Ok(res);
         }
+        [HttpPut("cropimg/{cid}")]
+        public async Task CropImage(int cid)
+        {
+            var filepath = "C:\\Users\\Devendra Sharma\\Downloads\\Dot Net Full Stack\\Csharp\\.netCore\\CaseStudy\\wwwroot\\uploads\\crops\\";
+            var files = Request.Form.Files;
+            foreach (IFormFile source in files)
+            {
+
+                string FileName = source.FileName;
+                string filePath = filepath +cid.ToString();
+                if (!System.IO.Directory.Exists(filePath))
+                {
+                    System.IO.Directory.CreateDirectory(filePath);
+                }
+                string imagePath = filePath + "\\image.jpg";
+                using(FileStream stream = System.IO.File.Create(imagePath))
+                {
+                    await source.CopyToAsync(stream);
+                }
+                await _service.CropImage(@"https://localhost:44346/uploads/crops/"+cid+"/image.jpg", cid);
+            }
+        }
     }
 }
