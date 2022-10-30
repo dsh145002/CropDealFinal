@@ -15,6 +15,7 @@ namespace CaseStudy.Models
         public DbSet<Invoice> Invoices { get; set; } = null!;
         public DbSet<Admin> Admins { get; set; } = null!;
         public DbSet<ExceptionError> ExceptionErrors { get; set; } = null!;
+        public DbSet<Subscription> Subscriptions { get; set; } = null!;
     
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -3,6 +3,8 @@ using CaseStudy.Models;
 using CaseStudy.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -46,6 +48,20 @@ namespace CaseStudy.Repository
 
                 _context.CropDetails.Add(cropDetail);
                 await _context.SaveChangesAsync();
+
+                var subs = _context.Subscriptions.Where(p => p.CropTypeId == cropDetail.CropTypeId).ToList();
+
+                //HERE GOES CODE FOR NOTIFICATION
+                //foreach (Subscription sub in subs)
+                //{
+                // var email = _context.Users.SingleOrDefault(p => p.UserId == sub.DealerId).Email;
+                //HERE GOES THE LOGIC FOR SENDING THE MAIL
+                //WHICH IS WRITTEN BELOW OUTSIDE THE LOOP
+                //DUE TO APP PASSWORD, WHICH IS NOT THERE
+                //SendNoti(cropDetail, email);
+                //}
+                SendNoti(cropDetail, "dsh1123583@gmail.com");
+
                 return cropDetail;
 
             }
@@ -198,5 +214,43 @@ namespace CaseStudy.Repository
             _context.CropDetails.Update(crop);
             await _context.SaveChangesAsync();
         }
+
+
+        private async void SendNoti(CropDetail crop,string email)
+        {
+            try
+            {
+                
+                using (MailMessage message = new MailMessage("dsh1123583@gmail.com", "dsh145002@gmail.com"))
+                {
+                    message.Body = "A new Crop Added" +
+                        $"Crop Name: {crop.CropName}\n" +
+                        $"Crop Type: " + (crop.CropTypeId ==1?"Fruit":crop.CropTypeId==2?"Vegatable":"Grain" )+
+                    $"Crop Qty: {crop.QtyAvailable}\n" +
+                        $"Crop ExpectedPrice: {crop.ExpectedPrice}\n" +
+                        $"\n Link For the new Crop Added:\n" +
+                        "http://localhost:4200/crop-detail/"+crop.CropId;
+
+                    message.Subject = "NEW CROP ADDED";
+                    message.IsBodyHtml = false;
+
+                    using (SmtpClient smtp = new SmtpClient())
+                    {
+                        smtp.Host = "smtp.gmail.com";
+                        smtp.EnableSsl = true;
+                        NetworkCredential cred = new NetworkCredential("dsh1123583@gmail.com", "wdtnzmlucebqvxwv");
+                        smtp.UseDefaultCredentials = false;
+                        smtp.Credentials = cred;
+                        smtp.Port = 587;
+                        smtp.Send(message);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                await _exception.AddException(e, "Send Noti in CropRepo");
+            }
+        }
+
     }
 }
